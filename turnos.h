@@ -38,12 +38,31 @@ int* get_servicios(turno t){
     return t.servicios;
 }
 
+int get_fpago(turno t){
+    return t.fpago;
+}
+
+void set_fpago(turno *t, int f){
+ t->fpago=f;
+}
+
+float get_subtotal(turno t){
+return t.subtotal;
+}
+
+void set_subtotal(turno *t, float s){
+ t->subtotal=s;
+}
 int get_dia_turno(turno t, int i){ //recursiva de busqueda?
     return t.fturno[i].ndia;
 }
 
 int get_mes_turno(turno t, int i){
 return t.fturno[i].mes;
+}
+
+int get_estado(turno t, int i, int h){
+ return t.fturno[i].hora[h];
 }
 
 
