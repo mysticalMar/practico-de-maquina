@@ -4,17 +4,15 @@
 #define MAX 100
 typedef struct {
 int ndia;
-int hora[4];
-} dia;
-typedef struct {
-dia d[249];
 int mes;
-} calendario;
+int hora[4];
+} fecha;
+
 typedef struct{
 char cliente[50];
 char idturno[4];
 int servicios;
-calendario fturno;
+fecha fturno[249];
 int fpago;
 float subtotal;
 } turno;
@@ -41,11 +39,11 @@ int* get_servicios(turno t){
 }
 
 int get_dia_turno(turno t, int i){ //recursiva de busqueda?
-    return t.fturno.d[i].ndia;
+    return t.fturno[i].ndia;
 }
 
-int get_mes_turno(turno t){
-return t.fturno.mes;
+int get_mes_turno(turno t, int i){
+return t.fturno[i].mes;
 }
 
 
@@ -58,11 +56,11 @@ FILE *fp=fopen("precarga.txt", "r");
  }
     while (!feof(fp)){
         for (i=0; i<dt; i++){
-            fscanf(fp, "%d \n", &f[i].fturno.mes);
             for (a=0; a<24; a++){
-            fscanf(fp, "%d \n", &f[i].fturno.d[a].ndia);
+            fscanf(fp, "%d \n", &f[i].fturno[a].mes);
+            fscanf(fp, "%d \n", &f[i].fturno[a].ndia);
                 for (o=0; o<4; o++){
-                fscanf(fp, "%d \n", &f[i].fturno.d[a].hora[o]);
+                fscanf(fp, "%d \n", &f[i].fturno[a].hora[o]);
                 }
             }
         }
@@ -74,12 +72,13 @@ void muestrafechas(turno t[], int d){
     int i, o, a;
         for (i=0; i<d; i++){
              for (a=0; a<23; a++){
-            printf("dia: %d \n", t[i].fturno.d[a].ndia);
+            printf("dia: %d \n", t[i].fturno[a].ndia);
+            printf("mes: %d \n", t[i].fturno[a].mes);
                 for (o=0; o<4; o++){
                 printf("hora: %d \t", o);
-                printf("estado: %d \n", t[i].fturno.d[a].hora[o]);
+                printf("estado: %d \n", t[i].fturno[a].hora[o]);
                 }
-                printf("mes: %d \n", t[i].fturno.mes);
+
              }
 
         }
