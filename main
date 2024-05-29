@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "turnos.h"
+#include "servicio.h"
+
+typedef struct {
+char fturno[5];
+int hora;
+int estado;
+} fecha;
+
+void precarga_calendario(fecha f[]){
+    int i;
+    FILE *fp=fopen("precarga.txt", "r");
+    if(fopen("precarga.txt","r")==NULL){
+        printf("no es posible abrir el archivo\n");
+        exit(1);
+    }
+    else {
+        for (i=0; i<1464; i++){
+            fscanf(fp, "%s \n", &f[i].fturno);
+            fscanf(fp, "%d \n", &f[i].hora);
+            fscanf(fp, "%d \n", &f[i].estado);
+        }
+    }
+}
+
+void muestra_calendario (fecha f[]){
+    int i;
+    for (i=0; i<1464; i++){
+            printf( "%s \n", f[i].fturno);
+            printf("%d \n", f[i].hora);
+            printf("%d \n", f[i].estado);
+        }
+}
