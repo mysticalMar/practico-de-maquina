@@ -2,13 +2,34 @@
 #include <stdlib.h>
 #include "turnos.h"
 #include "servicio.h"
-
+#include "lista turnos.h"
 typedef struct {
 char fturno[5];
 int hora;
 int estado;
 } fecha;
 
+
+char *randstring(size_t length) {
+    int n;
+    static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
+    char *randomString = NULL;
+
+    if (length) {
+        randomString = malloc(sizeof(char) * (length +1));
+
+        if (randomString) {
+            for (n = 0;n < length;n++) {
+                int key = rand() % (int)(sizeof(charset) -1);
+                randomString[n] = charset[key];
+            }
+
+            randomString[length] = '\0';
+        }
+    }
+
+    return randomString;
+}
 void precarga_calendario(fecha f[]){
     int i;
     FILE *fp=fopen("precarga.txt", "r");
@@ -33,3 +54,30 @@ void muestra_calendario (fecha f[]){
             printf("%d \n", f[i].estado);
         }
 }
+
+void carga_turno(turno *t){
+char cliente[50], fechat[5], idturno[5];
+int servicios, fpago;
+strcpy(idturno, randstring(5));
+set_idturno(t, idturno);
+printf("Ingrese el nombre de cliente \n");
+scanf("%[^\n]s \n", &cliente);
+set_cliente(t, cliente);
+printf("Ingrese el número de servicio \n"); //ofrecer bien los servicios, esto es un prototipo!
+scanf("%d \n", &servicios);
+set_servicios(t, servicios);
+printf("Ingrese la forma de pago \n");
+scanf("%d \n", &fpago);
+}
+//a) Cargar un turno en la lista por teclado. Debe respetar la posición , ya que la posición es el código del mismo.
+//Mostrar las opciones de turno disponible para la semana antes de agendar el mismo.
+//Considere que el cálculo del total a pagar debe ser realizado al final de la carga del turno y se debe mostrar el
+//subtotal y total para confirmar el turno.
+void carga_lista(lista *l){
+ turno t;
+}
+int main()
+{
+
+}
+
