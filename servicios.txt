@@ -1,0 +1,63 @@
+0
+cambio de aceite
+5000
+0
+1
+revision y reemplazo de frenos
+6000
+5
+2
+alineacion de ruedas
+7000
+40
+3
+mantenimiento de suspension
+8000
+3
+40
+4
+cambio de aceite
+5000
+0
+5
+revision y reemplazo de frenos
+6000
+50
+6
+alineacion de ruedas
+7000
+40
+7
+mantenimiento de suspension
+8000
+3
+40
+8
+cambio de aceite
+5000
+0
+9
+revision y reemplazo de frenos
+6000
+50
+10
+alineacion de ruedas
+7000
+40
+11
+mantenimiento de suspension
+8000
+3
+40
+12
+cambio de aceite
+5000
+0
+13
+revision y reemplazo de frenos
+6000
+50
+14
+alineacion de ruedas
+7000
+40
