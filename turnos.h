@@ -25,12 +25,16 @@ char* get_idturno(turno t){
     return t.idturno;
 }
 
-void set_idturno(turno *t, char idturno){
+void set_idturno(turno *t, char* idturno){
     strcpy(t->idturno, idturno);
 }
 
 int get_servicios(turno t){
     return t.servicios;
+}
+
+void set_servicios(turno *t, int s){
+t->servicios=s;
 }
 
 int get_fpago(turno t){
@@ -53,7 +57,7 @@ char* get_fecha(turno t){
 return t.fpago;
 }
 
-void set_fecha(turno *t, char f[]){
+void set_fecha(turno *t, char* f[]){
 strcpy(t->fturno, f);
 }
 
