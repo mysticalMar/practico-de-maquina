@@ -4,12 +4,17 @@
 #include "servicio.h"
 #include "lista turnos.h"
 typedef struct {
-char fturno[5];
-int hora;
+char* fturno[5];
+char* hora[5];
 int estado;
 } fecha;
 
-
+fecha f[1464];
+int cantd=0; //se inicializa la cantidad de dias mostrados
+servicio aux_servicio[15];
+void inici(servicio aux[]){
+precarga_servicio(aux);
+}
 char *randstring(size_t length) {
     int n;
     static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-#'?!";
@@ -40,44 +45,96 @@ void precarga_calendario(fecha f[]){
     else {
         for (i=0; i<1464; i++){
             fscanf(fp, "%s \n", &f[i].fturno);
-            fscanf(fp, "%d \n", &f[i].hora);
+            fscanf(fp, "%s \n", &f[i].hora);
             fscanf(fp, "%d \n", &f[i].estado);
         }
     }
 }
-
-void muestra_calendario (fecha f[]){
+void muestra_calendario(fecha f[]){
     int i;
     for (i=0; i<1464; i++){
-            printf( "%s \n", f[i].fturno);
-            printf("%d \n", f[i].hora);
+            printf("%s \n", f[i].fturno);
+            printf("%s \n", f[i].hora);
             printf("%d \n", f[i].estado);
         }
+}
+void muestra_dias_disponibles(fecha f[], int *a){ //a registra cuántos dias se mostraron, similar a cant. se pasa por dirección para actualizar la variable cada vez que se invoca
+    int i;
+        for (i=0; i<28; i++){
+                if (f[i].estado==0){
+                printf("Turno: %d \n", i);
+                printf("Dia: %s \n", f[i].fturno);
+                printf("Hora: %s \n", f[i].hora);
+            }
+    }
+    *a=*a+28;
+}
+
+int seleccion_servicio(turno *t){
+int serv;
+int i;
+printf("Seleccione un servicio: \n");
+for (i=0; i<15; i++){
+    printf("%d: %s \n",i, aux_servicio[i].descripcion);
+    printf("Precio: %f \n", aux_servicio[i].precio);
+    printf("Descuento: %d \n", aux_servicio[i].descuento);
+}
+scanf("%d", &serv);
+set_servicios(t, serv);
+return serv;
 }
 
 void carga_turno(turno *t){
 char cliente[50], fechat[5], idturno[5];
-int servicios, fpago;
-strcpy(idturno, randstring(5));
+int estado,servicios, fpago, diat; //diat es el número de turno elegido
+float total, subtotal;
+strcpy(idturno, randstring(5)); //inicializa el id turno con un string aleatorio de letras y numeros
 set_idturno(t, idturno);
+muestra_dias_disponibles(f, &cantd);
+scanf("%d", &diat);
+getchar();
+strcpy(fechat, f[diat].fturno);
+set_fecha(t, fechat);
 printf("Ingrese el nombre de cliente \n");
 scanf("%[^\n]s \n", &cliente);
 set_cliente(t, cliente);
-printf("Ingrese el número de servicio \n"); //ofrecer bien los servicios, esto es un prototipo!
-scanf("%d \n", &servicios);
-set_servicios(t, servicios);
-printf("Ingrese la forma de pago \n");
-scanf("%d \n", &fpago);
+servicios=seleccion_servicio(t);
+set_subtotal(t, get_precio(aux_servicio[servicios]));
+subtotal=get_precio(aux_servicio[servicios]);
+    if (get_descuento(aux_servicio[servicios])==0){
+        total=get_precio(aux_servicio[servicios]);
+    }
+        else {
+        total=get_precio(aux_servicio[servicios])*(get_descuento(aux_servicio[servicios]))/100;
+        }
+printf("Ingrese la forma de pago 1: Debito, 2: Credito 3: Efectivo  4:QR \n");
+scanf("%d", &fpago);
+getchar();
+set_fpago(t, fpago);
+printf("Subtotal: %f \n", subtotal);
+printf("Total con descuento: %f \n", total);
+printf("Desea confimar el turno? 1: si, 0: no \n"); //y si no confirma el turno? exit? guardamos los datos?
+scanf("%d", &estado);
+f[diat].estado=estado;
 }
 //a) Cargar un turno en la lista por teclado. Debe respetar la posición , ya que la posición es el código del mismo.
 //Mostrar las opciones de turno disponible para la semana antes de agendar el mismo.
 //Considere que el cálculo del total a pagar debe ser realizado al final de la carga del turno y se debe mostrar el
 //subtotal y total para confirmar el turno.
-void carga_lista(lista *l){
- turno t;
-}
-int main()
-{
 
+void muestra_turno(turno t){
+printf("ID turno: %s \n", get_idturno(t));
+printf("Nombre del cliente: %s \n", get_cliente(t));
+printf("Servicio: %d:", get_servicios(t));
+printf(" %s \n", get_descripcion(aux_servicio[get_servicios(t)]));
+printf("Subtotal: %f \n", get_subtotal(t));
+printf("Forma de pago: %d \n", get_fpago(t)); //switch
 }
 
+int main(){
+turno t;
+precarga_calendario(f);
+precarga_servicio(aux_servicio);
+carga_turno(&t);
+muestra_turno(t);
+}
