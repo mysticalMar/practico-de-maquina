@@ -71,7 +71,7 @@ void muestra_calendario(fecha f[])
 int busca_fecha(fecha f[], char a[]){ //función que retorna la posición en el arreglo de la fecha pasada por parámetro
     int i;
     for (i=0; i<1464; i++){
-        if (strcmp(f[i].fturno, a)==1){
+        if (strcmp(f[i].fturno, a)==0){
             return i;
             exit(1);
         }
@@ -162,137 +162,59 @@ turno carga_turno()
     }
     return t;
 }
-//a) Cargar un turno en la lista por teclado. Debe respetar la posición , ya que la posición es el código del mismo.
-//Mostrar las opciones de turno disponible para la semana antes de agendar el mismo.
-//Considere que el cálculo del total a pagar debe ser realizado al final de la carga del turno y se debe mostrar el
-//subtotal y total para confirmar el turno.
+
 
 void muestra_turno(turno t)
 {
+    printf("test");
+    getchar();
     int i;
     printf("ID turno: %s \n", get_idturno(t));
     printf("Fecha: %s \n", get_fecha(t));
+    printf("Posicion fecha: %d \n", busca_fecha(f, get_fecha(t)));
     printf("Nombre del cliente: %s \n", get_cliente(t));
     for (i=0; i<15; i++){
       if (get_servicios(t, i)==1){ //si el servicio está seleccionado
         printf("Servicio: %d:", i);
-        printf("%s \n", get_descripcion(aux_servicio[i]));
+        printf(" %s \n", get_descripcion(aux_servicio[i]));
       }
 
     }
     printf("Subtotal: %f \n", get_subtotal(t));
     printf("Forma de pago: %d \n", get_fpago(t)); //switch
 }
-lista carga_lista(){
-    lista l;
-    inicio(&l);
+//a) Cargar un turno en la lista por teclado. Debe respetar la posición , ya que la posición es el código del mismo.
+//Mostrar las opciones de turno disponible para la semana antes de agendar el mismo.
+//Considere que el cálculo del total a pagar debe ser realizado al final de la carga del turno y se debe mostrar el
+//subtotal y total para confirmar el turno.
+void carga_lista(lista *l){
     turno t=carga_turno();
     turno p;
-    reset(&l);
-    if (isEmpty(l)==1){
-        insertar(&l, t); //help
+    reset(l);
+    if (isEmpty(*l)){
+        insertar(l, t);
     }
         else {
-            forwards(&l);
-            p=copia(l);
-            while (!isOos(l)){
+            forwards(l);
+            p=copia(&l);
+            while (!isOos(&l)){
                 if (busca_fecha(f, get_fecha(p))>busca_fecha(f, get_fecha(t))){
-                       insertar(&l, t);
+                       insertar(l, t);
                 }
-                    else forwards(&l);
-                     p=copia(l);
+                    else forwards(l);
+                     p=copia(&l);
             }
     }
-    reset(&l);
-    //condicional
-return l;
-}
-
-// d) Mostrar todos los turnos de una semana ordenados por dia
-void muestra_turnos_ordenados_fecha(lista l){
-    reset(&l);
-    turno t, u;
-    while (!isOos(l)){
-        t=copia(l);
-        forwards(&l);
-        u=copia(l);
-         if (busca_fecha(f, get_fecha(t))<busca_fecha(f, get_fecha(u))){ //si la fecha de t está en una posición anterior a la de u
-            muestra_turno(t);
-         }
-            else muestra_turno(u);
-    }
-}
-
-//e) Mostrar los turnos por nombre, paginar la muestra de los datos
-void muestra_turnos_ordenados_nombre(lista l){
-
-    reset(&l);
-    turno t, u;
-    while (!isOos(l)){
-        t=copia(l);
-        forwards(&l);
-        u=copia(l);
-         if(get_idturno(t)[0]<get_idturno(u)[0]){
-            muestra_turno(t);
-         }
-            else muestra_turno(u);
-    }
-}
-
-// j) Modificar la forma de pago de un turno según su idturno
-void modifica_turno (turno *t, char id[], char fp){
-    if (strcmp(get_idturno(*t), id)==1){
-        set_fpago(&t, fp);
-    }
-}
-
-void modifica_turno2(lista *l, char id[], char fp){
-    turno t;
-    reset(&l);
-    while (!isOos){
-        if (strcmp(get_idturno(copia(*l)), id)==1){
-            t=copia(*l);
-            set_fpago(&t, fp);
-            insertar(&l, t);
-        }
-            else forwards(&l);
-    }
-}
-
-// k) Anular un turno por idturno, esta función copia en un archivo los datos del turno borrado antes de eliminarlo. Los datos deben ser legibles desde un editor de texto.
-void anula_turno(lista *l, char id[]){
-  FILE *fp=fopen("backup.txt", "w");
-  int i;
-  if (fopen("backup.txt", "w")==NULL){
-    printf("no se puede abrir el archivo \n");
-    exit(1);
-  }
-
-  reset(&l);
-  while(!isOos){
-    if (strcmp(get_idturno(copia(*l)), id)==1){
-            while (!feof(fp)){
-                fscanf(fp, "%s \n", get_idturno(copia(*l)));
-                fscanf(fp, "%[^\n]s \n", get_cliente(copia(*l)));
-                fscanf(fp, "%s \n", get_fecha(copia(*l)));
-                fscanf(fp, "%d \n", get_fpago(copia(*l)));
-                fscanf(fp, "%f \n", get_subtotal(copia(*l)));
-                for (i=0; i<15; i++){
-                fscanf(fp, "%d \n", get_servicios(copia(*l), i));
-                }
-
-
-    }
-    fclose(fp);
-    suprimir(&l);
-    }
-  }
 }
 int main()
 {
     lista l;
+    inicio(&l);
     precarga_calendario(f);
     precarga_servicio(aux_servicio);
-    l=carga_lista();
-    muestra_turno(copia(l));
+    carga_lista(&l);
+    carga_lista(&l);
+    muestra_turno(copia(&l));
+    //forwards(&l);
+    //muestra_turno(copia(&l));
 }
