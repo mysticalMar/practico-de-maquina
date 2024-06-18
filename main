@@ -183,38 +183,40 @@ void muestra_turno(turno t)
     printf("Subtotal: %f \n", get_subtotal(t));
     printf("Forma de pago: %d \n", get_fpago(t)); //switch
 }
+
+
 //a) Cargar un turno en la lista por teclado. Debe respetar la posición , ya que la posición es el código del mismo.
 //Mostrar las opciones de turno disponible para la semana antes de agendar el mismo.
 //Considere que el cálculo del total a pagar debe ser realizado al final de la carga del turno y se debe mostrar el
 //subtotal y total para confirmar el turno.
-void carga_lista(lista *l){
-    turno t=carga_turno();
-    turno p;
-    reset(l);
-    if (isEmpty(*l)){
-        insertar(l, t);
-    }
-        else {
-            forwards(l);
-            p=copia(&l);
-            while (!isOos(&l)){
-                if (busca_fecha(f, get_fecha(p))>busca_fecha(f, get_fecha(t))){
-                       insertar(l, t);
+void ordena(lista *l, int fecha){
+    printf("test");
+    reset(&l);
+    turno p=copia(*l);
+    int fecha2=busca_fecha(f, get_fecha(p));
+    while (!isOos(*l)){
+                if (fecha<fecha2){
+                    exit(1);
                 }
                     else forwards(l);
-                     p=copia(&l);
             }
-    }
 }
+
 int main()
 {
     lista l;
     inicio(&l);
     precarga_calendario(f);
     precarga_servicio(aux_servicio);
-    carga_lista(&l);
-    carga_lista(&l);
-    muestra_turno(copia(&l));
+    turno t=carga_turno();
+    if (isEmpty(l)){
+        insertar(&l, t);
+        muestra_turno(copia(l));
+    }
+        else {
+            ordena(&l, busca_fecha(f, get_fecha(t)));
+            insertar(&l, t);
+        }
     //forwards(&l);
     //muestra_turno(copia(&l));
 }
