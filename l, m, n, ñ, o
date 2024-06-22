@@ -1,0 +1,97 @@
+//l) Almacenar en un archivo los datos de los turnos pagados según una forma de pago pasada por parámetro. Los campos
+//codificados deben estar decodificados en el archivo de manera tal que sea legible de un editor de texto. Informar por
+//pantalla cuantos turnos se copiaron en el archivo.
+
+
+int almacena_datos (lista l, int fpago){
+    reset(&l);
+    int contador=0;
+    FILE *fp=fopen("datos.txt","w");
+    if (fopen("datos.txt","w")==NULL){
+        printf("no se puede abrir el archivo\n");
+        exit(1);
+    }
+    while(!isOos(l)){
+        if(get_fpago(copia(l))==fpago){
+            fprintf(fp,"ID turno: %s \n", get_idturno(copia(l)));
+            fprintf(fp,"Fecha: %s \n", get_fecha(copia(l)));
+            fprintf(fp,"posicion fecha: %d \n", busca_fecha(f,get_fecha(copia(l))));
+            fprintf(fp,"Nombre del cliente: %s \n", get_cliente(copia(l)));
+            for(int i=0; i<15;i++){
+                      if (get_servicios(copia(l), i)==1){
+                            fprintf(fp,"Servicio: %d:", i);
+                            fprintf(fp," %s \n", get_descripcion(aux_servicio[i]));
+                }
+            }
+            fprintf(fp,"Subtotal: %f \n",get_subtotal(copia(l)));
+            fprintf(fp,"Forma de pago:%d \n",get_fpago(copia(l)));
+            contador++;
+        }
+        forwards(&l);
+    }
+    printf("se copiaron %d turnos\n", contador);
+    fclose(fp);
+}
+
+//m)Una opción que permita realizar la precarga de turnos anteriores, mediante un archivo
+void precarga_archivo (lista *l, servicio s[]){
+    reset(&l);
+    turno t;
+    char cliente[50], fechat[5], idturno[5];
+    int descuento,servicios, fpago, i; //diat es el número de turno elegido
+    float subtotal;
+    FILE *fp=fopen("turnos.txt","r");
+    while(!feof(fp)&&!isOos(*l)){
+        fscanf(fp,"[^\n]s \n",cliente);
+        t=copia(*l);
+        set_cliente(&t,cliente);
+        fscanf(fp,"[^\n]s \n",idturno);
+        set_idturno(&t,idturno);
+        fscanf(fp,"%d \n",&servicios);
+        set_servicios(&t,servicios);
+        fscanf(fp,"%s \n",fechat);
+        set_fecha(&t,fechat);
+        fscanf(fp,"%d \n",&fpago);
+        set_fpago(&t,fpago);
+        fscanf(fp,"%f \n",&subtotal);
+        set_subtotal(&t,subtotal);
+        for(i=0;i<15;i++){
+            if(servicios==s[i].id_servicio){
+               descuento=get_descuento(s);
+               set_subtotal(&t,subtotal); 
+            }
+        }
+        insertar(&l,t);
+    }
+}
+
+//ñ) Realizar una precarga automática al iniciar el programa de los servicios en el arreglo
+//esta en el tda servicio
+
+//n) Modificar precio y descripción del servicio según idservicio
+void modifica_pyd (servicio s[],int idservicio){
+    int i;
+    float p;
+    char d[50];
+    for(i=0;i<15;i++){
+        if (i==idservicio){
+            printf("ingresar el nuevo precio del servicio\n");
+            scanf("%f",&p);
+            set_precio(&s[i],p);
+            printf("ingrse la nueva descripcion del servicio\n");
+            scanf("%[^\n]s",d);
+            set_descripcion(&s[i],d);
+        }
+    }
+}
+
+//o) Mostrar todos los servicios
+void muestra_servicios (servicio s[]){
+    int i;
+    for(i=0;i<15;i++){
+        printf("id del servicio: %d \n",get_id_servicio(s[i]));
+        printf("descripcion del servicio: %s \n", get_descripcion(s[i]));
+        printf("precio del servicio: %f \n", get_precio(s[i]));
+        printf("porcentaje de descuento: %d \n",get_descuento(s[i]));
+    }
+}
