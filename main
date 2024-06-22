@@ -249,116 +249,107 @@ void muestra_turnos_ordenados_nombre(lista l, int c, int e){ //65, 1
 
 
 int main()
-{   int opcion, fpc4, i;
+{   int m=0, fpc4, i;
     char dia[5], id[4];
     turno t;
     lista l;
     inicio(&l);
     precarga_calendario(f);
     precarga_servicio(aux_servicio);
-     while (1) { // Bucle infinito, se romperá solo cuando el usuario elija salir
-        printf("Seleccione una opción:\n");
-        printf("1. Cargar un turno en la lista por teclado\n");
-        printf("2. Buscar día\n");
-        printf("3. Mostrar turnos ordenados por nombre\n");
-        printf("4. Modificar la forma de pago de un turno\n");
-        printf("5. Anular un turno\n");
-        printf("6. Salir\n");
-        scanf("%d", &opcion);
-
-        switch (opcion) {
+    while (m==0){
+     printf("opcion \n");
+     scanf("%d", &m);
+        switch (m){
+            //a) Cargar un turno en la lista por teclado. Debe respetar la posición , ya que la posición es el código del mismo.
             case 1: {
-                turno t = carga_turno();
-                if (isEmpty(l) == 1) {
-                    insertar(&l, t);
-                } else {
+            turno t=carga_turno();
+            if (isEmpty(l)==1){
+                insertar(&l, t);
+            }
+                else {
                     ordena(&l, busca_fecha(f, get_fecha(t)));
                     insertar(&l, t);
                 }
+                m=0;
                 break;
             }
             case 2: {
-                printf("¿Qué día desea buscar? \n");
-                scanf("%s", dia);
-                muestra_turnos_ordenados_dia(l, dia); // Controlar si está vacía
-                printf("test \n");
+                printf("que dia desea buscar? \n");
+                scanf("%s", &dia);
+                muestra_turnos_ordenados_dia(l, dia); //controlar si está vacía
+                  printf("test \n");
+                m=0;
                 break;
             }
             case 3: {
-                muestra_turnos_ordenados_nombre(l, 65, 1); // Condicional de control si l está vacía
+                muestra_turnos_ordenados_nombre(l, 65, 1); //condicional de control si l está vacia
+                m=0;
                 break;
             }
-            case 4: {
-                printf("¿Qué número de turno desea modificar? \n");
-                while (!isOos(l)) {
+            case 4: { // j) Modificar la forma de pago de un turno según su idturno
+                printf("que numero de turno desea modificar? \n");
+                while (!isOos(l)){
                     muestra_turno(copia(l));
                     forwards(&l);
                 }
                 scanf("%s", &id);
                 getchar();
-                printf("Ingrese la nueva forma de pago \n");
+                printf("ingrese la nueva forma de pago \n");
                 scanf("%d", &fpc4);
                 getchar();
+
                 reset(&l);
-                while (!isOos(l)) {
-                    if (strcmp(get_idturno(copia(l)), id) == 0) {
-                        t = copia(l);
+                   while (!isOos(l)){
+                        if (strcmp(get_idturno(copia(l)), id)==0){
+                        t=copia(l);
                         set_fpago(&t, fpc4);
                         insertar(&l, t);
                         muestra_turno(copia(l));
-                        break;
-                    } else {
-                        forwards(&l);
+                        exit(0);
+                        }
+                            else forwards(&l);
                     }
-                }
+                m=0;
                 break;
             }
-            case 5: {
-                printf("¿Qué turno desea anular? \n");
-                reset(&l);
-                while (!isOos(l)) {
-                    muestra_turno(copia(l));
-                    forwards(&l);
-                }
-                reset(&l);
+            case 5: {// k) Anular un turno por idturno, esta función copia en un archivo los datos del turno borrado antes de eliminarlo. Los datos deben ser legibles desde un editor de texto.
+                  printf("que turno desea anular? \n");
+                    reset(&l);
+                    while (!isOos(l)){
+                        muestra_turno(copia(l));
+                        forwards(&l);
+                    }
+                    reset(&l);
                 scanf("%s", &id);
                 getchar();
-                FILE *fp = fopen("backup.txt", "w");
-                if (fp == NULL) {
-                    printf("No se puede abrir el archivo \n");
+                FILE *fp=fopen("backup.txt", "w");
+                  if (fopen("backup.txt", "w")==NULL){
+                    printf("no se puede abrir el archivo \n");
                     exit(1);
-                }
-                if (!isOos(l)) {
-                    if (strcmp(get_idturno(copia(l)), id) == 0) {
-                        fprintf(fp, "ID: %s \n", get_idturno(copia(l)));
-                        fprintf(fp, "Nombre: %s \n", get_cliente(copia(l)));
-                        fprintf(fp, "Fecha: %s \n", get_fecha(copia(l)));
-                        fprintf(fp, "Forma de pago: %d \n", get_fpago(copia(l)));
-                        fprintf(fp, "Subtotal: %f \n", get_subtotal(copia(l)));
-                        for (i = 0; i < 15; i++) {
-                            if (get_servicios(copia(l), i) == 1) {
-                                fprintf(fp, "%d: ", i);
-                                fprintf(fp, "%s \n", get_descripcion(aux_servicio[i]));
-                            }
-                        }
+                  }
+
+                  if (!isOos(l)){
+                    if (strcmp(get_idturno(copia(l)), id)==0){
+                                fprintf(fp, "ID: %s \n", get_idturno(copia(l)));
+                                fprintf(fp, "Nombre: %s \n", get_cliente(copia(l)));
+                                fprintf(fp, "Fecha: %s \n", get_fecha(copia(l)));
+                                fprintf(fp, "Forma de pago: %d \n", get_fpago(copia(l)));
+                                fprintf(fp, "Subtotal: %f \n", get_subtotal(copia(l)));
+                                for (i=0; i<15; i++){
+                                     if (get_servicios(copia(l), i)==1){ //si el servicio está seleccionado
+                                        fprintf(fp, "%d: ", i);
+                                        fprintf(fp, "%s \n", get_descripcion(aux_servicio[i]));
+                                    }
+                                }
                     }
                     fclose(fp);
                     suprimir(&l);
+                    }
+                  }
+                m=0;
+                break;
                 }
-                break;
             }
-            case 6: {
-                printf("Saliendo del programa...\n");
-                return 0; // Salir del programa
-            }
-            default: {
-                printf("Opción no válida\n");
-                break;
-            }
-        }
-    }
-    return 0;
 }
-
 
 
