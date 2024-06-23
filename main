@@ -106,6 +106,13 @@ int seleccion_servicio(turno *t)
     }
     scanf("%d", &serv);
     getchar();
+    do {
+        if (serv<0||serv>15){
+            printf("numero de servicio invalido, seleccione un numero entre 0 y 14 \n");
+              scanf("%d", &serv);
+              getchar();
+        }
+    } while ((serv<0||serv>15));
     set_servicios(t, serv);
     return serv;
 }
@@ -123,28 +130,44 @@ turno carga_turno()
 
         muestra_dias_disponibles(f, &cantd); //Mostrar las opciones de turno disponible para la semana antes de agendar el mismo.
         scanf("%d", &diat);
-        getchar();
+           getchar();
+        do {
+            if (f[diat].estado==1){
+                printf("dia ocupado, seleccione otro dia \n");
+                 muestra_dias_disponibles(f, &cantd);
+                    scanf("%d", &diat);
+                    getchar();
+            }
+        } while (f[diat].estado==1);
+
         strcpy(fechat, f[diat].fturno);
         set_fecha(&t, fechat); //se guarda la fecha seleccionada
         printf("Fecha: %s \n", get_fecha(t));
-        printf("Hora: %s \n", f[diat].hora);
+        printf("Hora: %s \n", f[diat].hora); //Este dato se pierde, solo queda el estado del día
 
         printf("Ingrese el nombre de cliente \n");
-        scanf("%[^\n]s", cliente);
+        scanf("%[^\n]s", &cliente);
         getchar();
         set_cliente(&t, cliente);
 
         servicios=seleccion_servicio(&t); //ofrece los servicios disponibles al usuario, y guarda el que selecciona
         set_subtotal(&t, get_precio(aux_servicio[servicios]));
         subtotal=get_precio(aux_servicio[servicios]);
-        if (get_descuento(aux_servicio[servicios])==0){
-            total=get_precio(aux_servicio[servicios]);
-        }
-            else total=get_precio(aux_servicio[servicios])*(get_descuento(aux_servicio[servicios]))/100; //calcula el descuento si lo tiene
+            if (get_descuento(aux_servicio[servicios])==0){
+                total=get_precio(aux_servicio[servicios]);
+            }
+                else total=get_precio(aux_servicio[servicios])*(get_descuento(aux_servicio[servicios]))/100; //calcula el descuento si lo tiene
 
-        printf("Ingrese la forma de pago 1: Debito, 2: Credito 3: Efectivo  4:QR \n");
+        printf("Ingrese la forma de pago 1: Debito, 2: Credito 3: Efectivo  4: QR \n");
         scanf("%d", &fpago);
         getchar();
+        do {
+            if (fpago<1||fpago>4){
+                printf("ingrese una opcion valida: 1: Debito, 2: Credito 3: Efectivo  4: QR  \n");
+                scanf("%d", &fpago);
+                getchar();
+            }
+        }while (fpago<1||fpago>4);
         set_fpago(&t, fpago);
         //Considere que el cálculo del total a pagar debe ser realizado al final de la carga del turno y se debe mostrar el
         //subtotal y total para confirmar el turno.
@@ -153,11 +176,17 @@ turno carga_turno()
         printf("Desea confimar el turno? 1: si, 0: no \n");
         scanf("%d", &guarda);
         getchar();
-        if(guarda==1){
-            rep=1;
-            f[diat].estado=guarda; //guarda el estado del turno
-
-        }
+        do {
+            if (guarda<0||guarda>1){
+                printf("opcion invalida, ingrese 1: si o 0: no \n");
+                scanf("%d", &guarda);
+                getchar();
+            }
+        } while (guarda<0||guarda>1);
+            if(guarda==1){
+                rep=1;
+                f[diat].estado=guarda; //guarda el estado del turno
+            }
 
     }
     return t;
@@ -179,7 +208,25 @@ void muestra_turno(turno t)
 
     }
     printf("Subtotal: %f \n", get_subtotal(t));
-    printf("Forma de pago: %d \n", get_fpago(t)); //switch
+    printf("Forma de pago:");//switch
+    switch(get_fpago(t)){
+        case 1: {
+            printf(" %d: Debito \n", get_fpago(t));
+            break;
+        }
+        case 2: {
+            printf("Credito \n", get_fpago(t));
+            break;
+        }
+        case 3: {
+            printf("Efectivo \n", get_fpago(t));
+            break;
+        }
+        case 4: {
+            printf("QR \n", get_fpago(t));
+            break;
+        }
+    }
 }
 
 
@@ -189,7 +236,7 @@ void ordena(lista *l, int fecha){
     int fecha2=busca_fecha(f, get_fecha(p));
     while (!isOos(*l)){
                 if (fecha<fecha2||fecha==fecha2){
-                    exit(1);
+                    exit(0);
                 }
                     else forwards(l);
             }
@@ -205,18 +252,13 @@ int elementos(lista l){
 }
 // d) Mostrar todos los turnos de una semana ordenados por dia
 void muestra_turnos_ordenados_dia(lista l, char dia[]){
-         int i;
         while (!isOos(l)){
-            for (i=0; i<1464; i++){
-                if (strcmp(f[i].fturno, get_fecha(copia(l)))==0){
+                if (strcmp(get_fecha(copia(l)), dia)==0){
                     muestra_turno(copia(l));
                     forwards(&l);
                 }
-                    else {
-                            forwards(&l);
-                    }
+                else forwards(&l);
             }
-        }
 }
 
 
@@ -236,6 +278,7 @@ void muestra_turnos_ordenados_nombre(lista l, int c, int e){ //65, 1
         while (!isOos(l)){
         if (get_cliente(copia(l))[0]==c){
             muestra_turno(copia(l));
+            getchar(); //para paginar
             forwards(&l);
             muestra_turnos_ordenados_nombre(l, c, e+1);
         }
@@ -247,19 +290,45 @@ void muestra_turnos_ordenados_nombre(lista l, int c, int e){ //65, 1
     }
 }
 
-
+//extra
+ int busca_posicion_h(fecha f[], char ft[5]){
+ int i;
+    for (i=0; i<1454; i++){
+        if(strcmp(f[i].fturno, ft[5])==0&&f[i].estado==0){
+            return i;
+        }
+    }
+ }
+ int comprueba(lista l, char id[]){
+    reset(&l);
+    int c;
+    while (!isOos(l)){
+        if(strcmp(id, get_idturno(copia(l)))==0){
+            return 0;
+        }
+           else forwards(&l);
+        }
+    return 1;
+    }
 int main()
-{   int m=0, fpc4, i;
+{   int opcion, fpc4, i;
     char dia[5], id[4];
     turno t;
     lista l;
     inicio(&l);
     precarga_calendario(f);
     precarga_servicio(aux_servicio);
-    while (m==0){
-     printf("opcion \n");
-     scanf("%d", &m);
-        switch (m){
+     while (1) {
+        printf("Seleccione una opcion: \n");
+        printf("1. Cargar un turno en la lista por teclado \n");
+        printf("2. Buscar dia \n");
+        printf("3. Mostrar turnos ordenados por nombre \n");
+        printf("4. Modificar la forma de pago de un turno \n");
+        printf("5. Anular un turno\n");
+        printf("6. Salir \n");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
             //a) Cargar un turno en la lista por teclado. Debe respetar la posición , ya que la posición es el código del mismo.
             case 1: {
             turno t=carga_turno();
@@ -270,20 +339,28 @@ int main()
                     ordena(&l, busca_fecha(f, get_fecha(t)));
                     insertar(&l, t);
                 }
-                m=0;
                 break;
             }
             case 2: {
+                 if (isEmpty(l)){
+                    printf("error: lista vacia \n");
+                    break;
+                }
                 printf("que dia desea buscar? \n");
                 scanf("%s", &dia);
+                do {
+                    if (strlen(dia)>5){ //confio en que el usuario no va a poner letras, solo controlo la longitud
+                        printf("Fecha invalida. Formato: 00/00 \n");
+                        printf("que dia desea buscar? \n");
+                        scanf("%s", &dia);
+                    }
+                } while (strlen(dia)>5);
+
                 muestra_turnos_ordenados_dia(l, dia); //controlar si está vacía
-                  printf("test \n");
-                m=0;
                 break;
             }
             case 3: {
                 muestra_turnos_ordenados_nombre(l, 65, 1); //condicional de control si l está vacia
-                m=0;
                 break;
             }
             case 4: { // j) Modificar la forma de pago de un turno según su idturno
@@ -294,22 +371,28 @@ int main()
                 }
                 scanf("%s", &id);
                 getchar();
-                printf("ingrese la nueva forma de pago \n");
+                 printf("Ingrese la forma de pago 1: Debito, 2: Credito 3: Efectivo  4: QR \n");
                 scanf("%d", &fpc4);
                 getchar();
-
+                    do {
+                        if (fpc4<1||fpc4>4){
+                            printf("ingrese una opcion valida: 1: Debito, 2: Credito 3: Efectivo  4: QR  \n");
+                            scanf("%d", &fpc4);
+                            getchar();
+                        }
+                    }while (fpc4<1||fpc4>4);
                 reset(&l);
                    while (!isOos(l)){
                         if (strcmp(get_idturno(copia(l)), id)==0){
                         t=copia(l);
                         set_fpago(&t, fpc4);
                         insertar(&l, t);
+                        printf("cambio exitoso :D \n");
                         muestra_turno(copia(l));
-                        exit(0);
+                        break;
                         }
                             else forwards(&l);
                     }
-                m=0;
                 break;
             }
             case 5: {// k) Anular un turno por idturno, esta función copia en un archivo los datos del turno borrado antes de eliminarlo. Los datos deben ser legibles desde un editor de texto.
@@ -345,11 +428,16 @@ int main()
                     fclose(fp);
                     suprimir(&l);
                     }
-                  }
-                m=0;
                 break;
                 }
+        case 6: {
+                printf("Saliendo del programa...\n");
+                return 0; // Salir del programa
             }
+        default: {
+                printf("Opción no valida\n");
+                break;
+            }
+        }
+    }
 }
-
-
