@@ -603,10 +603,6 @@ int main()
                 break;
             }
             case 10: { //o muestra todos los servicios
-                 if (isEmpty(l)){
-                    printf("error: lista vacia \n");
-                    break;
-                }
                 muestra_servicios(aux_servicio);
                 break;
             }
