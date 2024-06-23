@@ -57,8 +57,9 @@ void precarga_archivo (lista *l, servicio s[]){
         set_subtotal(&t,subtotal);
         for(i=0;i<15;i++){
             if(servicios==s[i].id_servicio){
-               descuento=get_descuento(s);
-               set_subtotal(&t,subtotal); 
+               descuento=get_descuento(*s);
+               subtotal= (subtotal*descuento)/100;
+               set_subtotal(&t,subtotal);
             }
         }
         insertar(&l,t);
