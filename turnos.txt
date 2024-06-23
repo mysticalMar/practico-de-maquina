@@ -1,0 +1,48 @@
+ID turno: PS3e4 
+Fecha: 08/01 
+posicion fecha: 28 
+Nombre del cliente: Sabrina 
+Servicio: 10: Alineacion de ruedas 
+Servicio: 12: Lavado de Motor 
+Subtotal: 16000.000000 
+Forma de pago:2 
+ID turno: ETMpq 
+Fecha: 08/01 
+posicion fecha: 28 
+Nombre del cliente: Pablo 
+Servicio: 8: Inspeccion de las zapatas del freno de estacionamiento 
+Servicio: 10: Alineacion de ruedas 
+Subtotal: 20000.000000 
+Forma de pago:2 
+ID turno: iCf'2 
+Fecha: 24/05 
+posicion fecha: 576 
+Nombre del cliente: Tania 
+Servicio: 4: Cambio de la faja del alternador 
+Servicio: 10: Alineacion de ruedas 
+Subtotal: 23000.000000 
+Forma de pago:1 
+ID turno: V,C8z 
+Fecha: 17/06 
+posicion fecha: 672 
+Nombre del cliente: Claudio 
+Servicio: 3: Cambio del refrigerante 
+Servicio: 10: Alineacion de ruedas 
+Subtotal: 12000.000000 
+Forma de pago:3 
+ID turno: 9yH0M 
+Fecha: 01/02 
+posicion fecha: 124 
+Nombre del cliente: Adrian 
+Servicio: 2: Cambio del filtro de nafta y aire 
+Servicio: 10: Alineacion de ruedas 
+Subtotal: 25000.000000 
+Forma de pago:4 
+ID turno: FHr1x 
+Fecha: 18/06 
+posicion fecha: 676 
+Nombre del cliente: Ricardo 
+Servicio: 9: Desmontaje y rotacion de ruedas 
+Servicio: 10: Alineacion de ruedas 
+Subtotal: 15000.000000 
+Forma de pago:4 
