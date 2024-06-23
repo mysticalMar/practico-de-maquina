@@ -127,7 +127,7 @@ turno carga_turno()
     while(rep==0){ //mientras que NO confirme
         strcpy(idturno, randstring(5)); //inicializa el id turno con un string aleatorio de letras y numeros
         set_idturno(&t, idturno);
-
+        printf("Ingrese el numero de turno que desea reservar \n");
         muestra_dias_disponibles(f, &cantd); //Mostrar las opciones de turno disponible para la semana antes de agendar el mismo.
         scanf("%d", &diat);
            getchar();
@@ -263,13 +263,18 @@ int elementos(lista l){
 }
 // d) Mostrar todos los turnos de una semana ordenados por dia
 void muestra_turnos_ordenados_dia(lista l, char dia[]){
-        while (!isOos(l)){
-                if (strcmp(get_fecha(copia(l)), dia)==0){
-                    muestra_turno(copia(l));
-                    forwards(&l);
+    int c=1;
+               while (!isOos(l)) {
+                    if (strcmp(get_fecha(copia(l)), dia)==0){
+                        muestra_turno(copia(l));
+                        c=0;
+                        forwards(&l);
                 }
                 else forwards(&l);
             }
+        if (c==1){
+            printf("error: no se encontro un turno con esta fecha \n");
+        }
 }
 
 
@@ -277,7 +282,7 @@ void muestra_turnos_ordenados_dia(lista l, char dia[]){
 //e) Mostrar los turnos por nombre, paginar la muestra de los datos
 void muestra_turnos_ordenados_nombre(lista l, int c, int e){ //65, 1
     if (c>172){
-        exit(0);
+        printf("fin de la lista \n");
     }
     else {
 
@@ -378,9 +383,11 @@ void modifica_pyd (servicio s[],int idservicio){
         if (i==idservicio){
             printf("ingresar el nuevo precio del servicio\n");
             scanf("%f",&p);
+            getchar();
             set_precio(&s[i],p);
             printf("ingrse la nueva descripcion del servicio\n");
             scanf("%[^\n]s",&d);
+            getchar();
             set_descripcion(&s[i],d);
         }
     }
@@ -406,17 +413,20 @@ void muestra_servicios (servicio s[]){
         }
     }
  }
- int comprueba(lista l, char id[]){
-    reset(&l);
-    int c;
-    while (!isOos(l)){
-        if(strcmp(id, get_idturno(copia(l)))==0){
-            return 0;
+int comprueba(lista *l, char id[]) {
+    reset(l);
+    int c=1;
+    while (!isOos(*l)) {
+        char *idlista = get_idturno(copia(*l));
+        if (strcmp(id, idlista)==0) {
+            c = 0;
         }
-           else forwards(&l);
-        }
-    return 1;
+        if (c == 0) break;
+        forwards(l);
     }
+    return c;
+}
+
 int main()
 {   int opcion, fpc4, i, fpago, serv;
     char dia[5], id[4], idturnoo[5];
@@ -430,7 +440,7 @@ int main()
         printf("1. Cargar un turno en la lista por teclado \n");//a
         printf("2. Buscar dia \n");//d
         printf("3. Mostrar turnos ordenados por nombre \n");//e
-        printf("4. Modificar la forma de pago de un turno \n");//i
+        printf("4. Modificar la forma de pago de un turno\n");//i
         printf("5. Anular un turno\n");//k
         printf("6. Mostrar turno \n");//b y c
         printf("7. Guardar en un archivo los turnos por su forma de pago \n"); //l
@@ -467,7 +477,7 @@ int main()
                         scanf("%s", &dia);
                     }
                 } while (strlen(dia)>5);
-
+                reset(&l);
                 muestra_turnos_ordenados_dia(l, dia); //controlar si está vacía
                 break;
             }
@@ -476,6 +486,7 @@ int main()
                     printf("error: lista vacia \n");
                     break;
                 }
+                reset(&l);
                 muestra_turnos_ordenados_nombre(l, 65, 1); //condicional de control si l está vacia
                 break;
             }
@@ -484,7 +495,7 @@ int main()
                     printf("error: lista vacia \n");
                     break;
                 }
-                printf("que numero de turno desea modificar? \n");
+                printf("ingrese el ID del turno desea modificar \n");
                 reset(&l);
                 while (!isOos(l)){
                     muestra_turno(copia(l));
@@ -492,6 +503,14 @@ int main()
                 }
                 scanf("%s", &id);
                 getchar();
+                 do {
+                    if (comprueba(&l, id)==1){
+                        printf("El ID ingresado no pertenece a ningun turno. Ingrese el ID de nuevo \n");
+                         scanf("%s", &id);
+                         getchar();
+                        reset(&l);
+                    }
+                } while (comprueba(&l, id)==1);
                  printf("Ingrese la forma de pago 1: Debito, 2: Credito 3: Efectivo  4: QR \n");
                 scanf("%d", &fpc4);
                 getchar();
@@ -530,6 +549,14 @@ int main()
                     reset(&l);
                 scanf("%s", &id);
                 getchar();
+                     do {
+                    if (comprueba(&l, id)==1){
+                        printf("El ID ingresado no pertenece a ningun turno. Ingrese el ID de nuevo \n");
+                         scanf("%s", &id);
+                         getchar();
+                        reset(&l);
+                    }
+                } while (comprueba(&l, id)==1);
                 FILE *fp=fopen("backup.txt", "w");
                   if (fopen("backup.txt", "w")==NULL){
                     printf("no se puede abrir el archivo \n");
@@ -561,7 +588,7 @@ int main()
                     printf("error: lista vacia \n");
                     break;
                 }
-                printf("ingrese el id del turno que desea burcar \n");
+                printf("ingrese el id del turno que desea buscar \n");
                 scanf ("%s", idturnoo);
                 muestra_turno(busca_turno(l,idturnoo));
                 break;
