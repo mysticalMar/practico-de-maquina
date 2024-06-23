@@ -1,7 +1,7 @@
 #ifndef LISTA_TURNOS_H_INCLUDED
 #define LISTA_TURNOS_H_INCLUDED
 #include "turnos.h"
-
+#include <malloc.h>
 typedef struct nodo{
 turno vipd; //dato
 struct nodo *next; //puntero al siguiente nodo
@@ -29,7 +29,9 @@ if (l.cursor==NULL) return 1;
 }
 
 int isEmpty(lista l){
-if (l.acceso->next==NULL) return 1;
+    if (l.acceso==NULL) {
+        return 1;
+    }
 else return 0;
 }
 
@@ -45,17 +47,18 @@ l->cursor=l->cursor->next;
 
 void insertar(lista *l, turno t){
 Nodo *aux=(Nodo *)malloc(sizeof(Nodo));
-if (l->cursor==l->acceso){ //inserto al principio
+if (l->cursor==l->acceso){
     l->acceso=aux;
     aux->next=l->cursor;
     l->cursor=l->acceso;
     l->cursorA=l->acceso;
+
 }
-else { //inserto en otro lado
-    l->cursorA=aux;
-    aux->next=l->cursor; //apunta al elemento que APUNTA EL CURSOR, NO AL CURSOR!!
-    l->cursor=aux;
-}
+    else { //inserto en otro lado
+        l->cursorA->next=aux;
+        aux->next=l->cursor; //apunta al elemento que APUNTA EL CURSOR, NO AL CURSOR!!
+        l->cursor=aux;
+    }
 l->cursor->vipd=t;
 }
 
