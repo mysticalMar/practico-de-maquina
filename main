@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 #include "turnos.h"
 #include "servicio.h"
 #include "lista turnos.h"
+
 typedef struct
 {
     char* fturno[5];
@@ -44,7 +46,7 @@ void precarga_calendario(fecha f[])
     FILE *fp=fopen("precarga.txt", "r");
     if(fopen("precarga.txt","r")==NULL)
     {
-        printf("no es posible abrir el archivo\n");
+        MessageBox(0,"No es posible abrir el archivo de precarga.", "Error", MB_OK );
         exit(1);
     }
     else
@@ -108,7 +110,8 @@ int seleccion_servicio(turno *t)
     getchar();
     do {
         if (serv<0||serv>15){
-            printf("numero de servicio invalido, seleccione un numero entre 0 y 14 \n");
+            printf("\a");
+            MessageBox(0,"Numero de servicio invalido, seleccione un numero entre 0 y 14.", "Error", MB_OK );
               scanf("%d", &serv);
               getchar();
         }
@@ -133,7 +136,7 @@ turno carga_turno()
            getchar();
         do {
             if (f[diat].estado==1){
-                printf("dia ocupado, seleccione otro dia \n");
+                MessageBox(0,"Día ocupado. Por favor, seleccione otro día.", "Error", MB_OK );
                  muestra_dias_disponibles(f, &cantd);
                     scanf("%d", &diat);
                     getchar();
@@ -163,7 +166,7 @@ turno carga_turno()
         getchar();
         do {
             if (fpago<1||fpago>4){
-                printf("ingrese una opcion valida: 1: Debito, 2: Credito 3: Efectivo  4: QR  \n");
+        MessageBox(0,"Ingrese una opcion valida: 1: Debito, 2: Credito 3: Efectivo  4: QR.", "Error", MB_OK );
                 scanf("%d", &fpago);
                 getchar();
             }
@@ -178,7 +181,7 @@ turno carga_turno()
         getchar();
         do {
             if (guarda<0||guarda>1){
-                printf("opcion invalida, ingrese 1: si o 0: no \n");
+               MessageBox(0,"Opción inválida, ingrese 1: si o 0: no", "Error", MB_OK );
                 scanf("%d", &guarda);
                 getchar();
             }
@@ -252,15 +255,7 @@ void ordena(lista *l, int fecha){
                     else forwards(l);
             }
 }
-int elementos(lista l){
-    int c=0;
-    reset(&l);
-    while (!isOos(l)){
-    c++;
-    forwards(&l);
-    }
-    return c;
-}
+
 // d) Mostrar todos los turnos de una semana ordenados por dia
 void muestra_turnos_ordenados_dia(lista l, char dia[]){
     int c=1;
@@ -273,7 +268,7 @@ void muestra_turnos_ordenados_dia(lista l, char dia[]){
                 else forwards(&l);
             }
         if (c==1){
-            printf("error: no se encontro un turno con esta fecha \n");
+         MessageBox(0,"No se encontró un turno con la fecha ingresada.", "Error", MB_OK );
         }
 }
 
@@ -308,7 +303,7 @@ void muestra_turnos_ordenados_nombre(lista l, int c, int e){ //65, 1
 //l) Almacenar en un archivo los datos de los turnos pagados según una forma de pago pasada por parámetro. Los campos
 //codificados deben estar decodificados en el archivo de manera tal que sea legible de un editor de texto. Informar por
 //pantalla cuantos turnos se copiaron en el archivo.
-int almacena_datos (lista l, int fpago){
+void almacena_datos (lista l, int fpago){
     reset(&l);
     int i, contador=0;
     FILE *fp=fopen("datos.txt","w");
@@ -340,35 +335,7 @@ int almacena_datos (lista l, int fpago){
 
 //m)Una opción que permita realizar la precarga de turnos anteriores, mediante un archivo
 void precarga_archivo (lista *l, servicio s[]){
-    reset(&l);
-    turno t;
-    char cliente[50], fechat[5], idturno[5];
-    int descuento,servicios, fpago, i; //diat es el número de turno elegido
-    float subtotal;
-    FILE *fp=fopen("turnos.txt","r");
-    while(!feof(fp)&&!isOos(*l)){
-        fscanf(fp,"[^\n]s \n",cliente);
-        t=copia(*l);
-        set_cliente(&t,cliente);
-        fscanf(fp,"[^\n]s \n",idturno);
-        set_idturno(&t,idturno);
-        fscanf(fp,"%d \n",&servicios);
-        set_servicios(&t,servicios);
-        fscanf(fp,"%s \n",fechat);
-        set_fecha(&t,fechat);
-        fscanf(fp,"%d \n",&fpago);
-        set_fpago(&t,fpago);
-        fscanf(fp,"%f \n",&subtotal);
-        set_subtotal(&t,subtotal);
-        for(i=0;i<15;i++){
-            if(servicios==s[i].id_servicio){
-               descuento=get_descuento(*s);
-               subtotal= (subtotal*descuento)/100;
-               set_subtotal(&t,subtotal);
-            }
-        }
-        insertar(&l,t);
-    }
+
 }
 
 //ñ) Realizar una precarga automática al iniciar el programa de los servicios en el arreglo
@@ -385,7 +352,7 @@ void modifica_pyd (servicio s[],int idservicio){
             scanf("%f",&p);
             getchar();
             set_precio(&s[i],p);
-            printf("ingrse la nueva descripcion del servicio\n");
+            printf("ingrese la nueva descripcion del servicio\n");
             scanf("%[^\n]s",&d);
             getchar();
             set_descripcion(&s[i],d);
@@ -405,6 +372,15 @@ void muestra_servicios (servicio s[]){
 }
 
 //extra
+int elementos(lista l){
+    int c=0;
+    reset(&l);
+    while (!isOos(l)){
+    c++;
+    forwards(&l);
+    }
+    return c;
+}
  int busca_posicion_h(fecha f[], char ft[5]){
  int i;
     for (i=0; i<1454; i++){
@@ -464,8 +440,9 @@ int main()
                 break;
             }
             case 2: {
-                 if (isEmpty(l)){
-                    printf("error: lista vacia \n");
+                   if (isEmpty(l)){
+                printf("\a");
+                MessageBox(0,"Lista vacía.", "Error", MB_OK );
                     break;
                 }
                 printf("que dia desea buscar? \n");
@@ -482,8 +459,9 @@ int main()
                 break;
             }
             case 3: {
-                 if (isEmpty(l)){
-                    printf("error: lista vacia \n");
+                    if (isEmpty(l)){
+                printf("\a");
+                MessageBox(0,"Lista vacía.", "Error", MB_OK );
                     break;
                 }
                 reset(&l);
@@ -491,8 +469,9 @@ int main()
                 break;
             }
             case 4: { // j) Modificar la forma de pago de un turno según su idturno
-                 if (isEmpty(l)){
-                    printf("error: lista vacia \n");
+                    if (isEmpty(l)){
+                printf("\a");
+                MessageBox(0,"Lista vacía.", "Error", MB_OK );
                     break;
                 }
                 printf("ingrese el ID del turno desea modificar \n");
@@ -516,7 +495,7 @@ int main()
                 getchar();
                     do {
                         if (fpc4<1||fpc4>4){
-                            printf("ingrese una opcion valida: 1: Debito, 2: Credito 3: Efectivo  4: QR  \n");
+                          MessageBox(0,"Ingrese una opcion valida: 1: Debito, 2: Credito 3: Efectivo  4: QR.", "Error", MB_OK );
                             scanf("%d", &fpc4);
                             getchar();
                         }
@@ -527,7 +506,7 @@ int main()
                         t=copia(l);
                         set_fpago(&t, fpc4);
                         insertar(&l, t);
-                        printf("cambio exitoso :D \n");
+                        MessageBox(0,"Cambio exitoso :D", "Aviso", MB_OK );
                         muestra_turno(copia(l));
                         break;
                         }
@@ -536,10 +515,11 @@ int main()
                 break;
             }
             case 5: {// k) Anular un turno por idturno, esta función copia en un archivo los datos del turno borrado antes de eliminarlo. Los datos deben ser legibles desde un editor de texto.
-                   if (isEmpty(l)){
-                    printf("error: lista vacia \n");
-                    break;
-                }
+                    if (isEmpty(l)){
+                    printf("\a");
+                    MessageBox(0,"Lista vacía.", "Error", MB_OK );
+                        break;
+                    }
                 printf("que turno desea anular? \n");
                     reset(&l);
                     while (!isOos(l)){
@@ -559,7 +539,7 @@ int main()
                 } while (comprueba(&l, id)==1);
                 FILE *fp=fopen("backup.txt", "w");
                   if (fopen("backup.txt", "w")==NULL){
-                    printf("no se puede abrir el archivo \n");
+                    MessageBox(0,"No se pudo abrir el archivo backup.txt.", "Error", MB_OK );
                     exit(1);
                   }
 
@@ -584,8 +564,9 @@ int main()
                 break;
                 }
             case 6: { //B y C pide el id del turno y entra a la funcion muestra, que utiliza la funcion busca_turno para mostrarlo
-                 if (isEmpty(l)){
-                    printf("error: lista vacia \n");
+                  if (isEmpty(l)){
+                printf("\a");
+                MessageBox(0,"Lista vacía.", "Error", MB_OK );
                     break;
                 }
                 printf("ingrese el id del turno que desea buscar \n");
@@ -595,7 +576,8 @@ int main()
             }
             case 7: {
                  if (isEmpty(l)){
-                    printf("error: lista vacia \n");
+                printf("\a");
+                MessageBox(0,"Lista vacía.", "Error", MB_OK );
                     break;
                 }
                 printf("Ingrese la forma de pago 1: Debito, 2: Credito 3: Efectivo  4: QR \n");
@@ -603,7 +585,7 @@ int main()
                 getchar();
                 do {
                     if (fpago<1||fpago>4){
-                        printf("ingrese una opcion valida: 1: Debito, 2: Credito 3: Efectivo  4: QR  \n");
+                        MessageBox(0,"Ingrese una opcion valida: 1: Debito, 2: Credito 3: Efectivo  4: QR.", "Error", MB_OK );
                         scanf("%d", &fpago);
                         getchar();
                     }
@@ -612,7 +594,41 @@ int main()
                 break;
             }
             case 8: { //M realiza una precarga de turnos anteriores desde un archivo
-                precarga_archivo(&l,aux_servicio);
+    reset(&l);
+    char cliente[50], fechat[5], idturno[5];
+    int descuento,servicios, fpago, i;
+    float subtotal;
+    FILE *fp=fopen("turnos.txt","r");
+        if (fopen("turnos.txt","r"==NULL)){
+            MessageBox(0,"No se pudo abrir el archivo turnos.txt.", "Error", MB_OK );
+            exit(1);
+            }
+    while(!feof(fp)){
+        fscanf(fp,"%s \n", &cliente);
+        printf("cliente: %s \n", cliente);
+        set_cliente(&t,cliente);
+        fscanf(fp,"%s \n", &idturno);
+        set_idturno(&t,idturno);
+        fscanf(fp,"%d \n",&servicios);
+        set_servicios(&t,servicios);
+        fscanf(fp,"%s \n", &fechat);
+        set_fecha(&t,fechat);
+        fscanf(fp,"%d \n",&fpago);
+        set_fpago(&t,fpago);
+        fscanf(fp,"%f \n",&subtotal);
+        set_subtotal(&t,subtotal);
+        for(i=0;i<15;i++){
+            if(servicios==aux_servicio[servicios].id_servicio){
+               descuento=get_descuento(aux_servicio[servicios]);
+               subtotal= (subtotal*descuento)/100;
+               set_subtotal(&t,subtotal);
+            }
+        }
+        insertar(&l,t);
+    }
+
+    fclose(fp);
+    MessageBox(0,"Carga completa.", "Aviso", MB_OK );
                 break;
             }
             case 9: {//N modifica el precio y la descripcion de un servicio por su id
@@ -621,7 +637,7 @@ int main()
                 getchar();
                     do {
                         if (serv<0||serv>15){
-                            printf("numero de servicio invalido, seleccione un numero entre 0 y 14 \n");
+                            MessageBox(0,"numero de servicio invalido, seleccione un numero entre 0 y 14.", "Error", MB_OK );
                             scanf("%d", &serv);
                             getchar();
                         }
@@ -638,9 +654,11 @@ int main()
                     return 0; // Salir del programa
                 }
             default: {
-                    printf("Opción no valida\n");
+                    MessageBox(0,"Opción inválida.", "Error", MB_OK );
                     break;
             }
         }
     }
 }
+
+
