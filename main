@@ -275,9 +275,10 @@ void muestra_turnos_ordenados_dia(lista l, char dia[]){
 
 
 //e) Mostrar los turnos por nombre, paginar la muestra de los datos
-void muestra_turnos_ordenados_nombre(lista l, int c, int e){ //65, 1
+void muestra_turnos_ordenados_nombre(lista l, int c, int e, int mostrados){ //65, 1
     if (c>172){
         printf("fin de la lista \n");
+        return;
     }
     else {
 
@@ -286,20 +287,22 @@ void muestra_turnos_ordenados_nombre(lista l, int c, int e){ //65, 1
             e=1;
             reset(&l);
          }
-        while (!isOos(l)){
-        if (get_cliente(copia(l))[0]==c){
+         if (mostrados==5){
+            printf("presione enter para mostrar mas turnos \n");
+            getchar();
+            mostrados=1;
+         }
+        while (!isOos(l)&&mostrados<6) {
+        if (get_cliente(copia(l))[0] == c) {
+            mostrados++;
             muestra_turno(copia(l));
-            getchar(); //para paginar
-            forwards(&l);
-            muestra_turnos_ordenados_nombre(l, c, e+1);
         }
-            else {
-                    forwards(&l);
-                    muestra_turnos_ordenados_nombre(l, c, e+1);
-            }
+        forwards(&l);
         }
+    muestra_turnos_ordenados_nombre(l, c, e+1, mostrados);
     }
 }
+
 //l) Almacenar en un archivo los datos de los turnos pagados según una forma de pago pasada por parámetro. Los campos
 //codificados deben estar decodificados en el archivo de manera tal que sea legible de un editor de texto. Informar por
 //pantalla cuantos turnos se copiaron en el archivo.
@@ -334,9 +337,6 @@ void almacena_datos (lista l, int fpago){
 }
 
 //m)Una opción que permita realizar la precarga de turnos anteriores, mediante un archivo
-void precarga_archivo (lista *l, servicio s[]){
-
-}
 
 //ñ) Realizar una precarga automática al iniciar el programa de los servicios en el arreglo
 //esta en el tda servicio
@@ -465,7 +465,7 @@ int main()
                     break;
                 }
                 reset(&l);
-                muestra_turnos_ordenados_nombre(l, 65, 1); //condicional de control si l está vacia
+                muestra_turnos_ordenados_nombre(l, 65, 1, 1); //condicional de control si l está vacia
                 break;
             }
             case 4: { // j) Modificar la forma de pago de un turno según su idturno
@@ -660,5 +660,3 @@ int main()
         }
     }
 }
-
-
