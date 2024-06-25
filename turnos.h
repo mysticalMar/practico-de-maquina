@@ -79,7 +79,18 @@ void set_fecha(turno *t, char* f[]){
 strcpy(t->fturno, f);
 }
 
-
+ //extra
+void reset_turno(turno *t) {
+    int i;
+    strcpy(t->cliente, "");
+    strcpy(t->fturno, "");
+    strcpy(t->idturno, "");
+    for (i=0; i<15; i++){
+    t->servicios[i] = 0;
+    }
+    t->fpago = 0;
+    t->subtotal = 0.0;
+}
 
 
 
