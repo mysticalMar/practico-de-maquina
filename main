@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,7 +6,6 @@
 #include "turnos.h"
 #include "servicio.h"
 #include "lista turnos.h"
-
 typedef struct
 {
     char* fturno[5];
@@ -94,7 +94,6 @@ void muestra_dias_disponibles(fecha f[], int *a)  //a registra cuántos dias se 
     }
     *a=*a+28;
 }
-
 int seleccion_servicio(turno *t)
 {
     int serv;
@@ -119,10 +118,10 @@ int seleccion_servicio(turno *t)
     set_servicios(t, serv);
     return serv;
 }
-
 turno carga_turno()
 {
     turno t;
+    reset_turno(&t);
     char cliente[50], fechat[5], idturno[5];
     int estado,servicios, fpago, diat, guarda, rep=0; //diat es el número de turno elegido
     float total, subtotal;
@@ -406,11 +405,13 @@ int comprueba(lista *l, char id[]) {
 int main()
 {   int opcion, fpc4, i, fpago, serv;
     char dia[5], id[4], idturnoo[5];
-    turno t;
     lista l;
     inicio(&l);
+    turno t;
+    reset_turno(&t);
     precarga_calendario(f);
     precarga_servicio(aux_servicio);
+
      while (1) {
         printf("Seleccione una opcion: \n");
         printf("1. Cargar un turno en la lista por teclado \n");//a
@@ -429,13 +430,15 @@ int main()
         switch (opcion) {
             //a) Cargar un turno en la lista por teclado. Debe respetar la posición , ya que la posición es el código del mismo.
             case 1: {
-            turno t=carga_turno();
+             t=carga_turno();
             if (isEmpty(l)==1){
                 insertar(&l, t);
+                reset_turno(&t);
             }
                 else {
                     ordena(&l, busca_fecha(f, get_fecha(t)));
                     insertar(&l, t);
+                    reset_turno(&t);
                 }
                 break;
             }
@@ -593,43 +596,44 @@ int main()
                 almacena_datos(l,fpago);
                 break;
             }
-            case 8: { //M realiza una precarga de turnos anteriores desde un archivo
-    reset(&l);
-    char cliente[50], fechat[5], idturno[5];
-    int descuento,servicios, fpago, i;
-    float subtotal;
-    FILE *fp=fopen("turnos.txt","r");
-        if (fopen("turnos.txt","r"==NULL)){
-            MessageBox(0,"No se pudo abrir el archivo turnos.txt.", "Error", MB_OK );
-            exit(1);
-            }
-    while(!feof(fp)){
-        fscanf(fp,"%s \n", &cliente);
-        printf("cliente: %s \n", cliente);
-        set_cliente(&t,cliente);
-        fscanf(fp,"%s \n", &idturno);
-        set_idturno(&t,idturno);
-        fscanf(fp,"%d \n",&servicios);
-        set_servicios(&t,servicios);
-        fscanf(fp,"%s \n", &fechat);
-        set_fecha(&t,fechat);
-        fscanf(fp,"%d \n",&fpago);
-        set_fpago(&t,fpago);
-        fscanf(fp,"%f \n",&subtotal);
-        set_subtotal(&t,subtotal);
-        for(i=0;i<15;i++){
-            if(servicios==aux_servicio[servicios].id_servicio){
-               descuento=get_descuento(aux_servicio[servicios]);
-               subtotal= (subtotal*descuento)/100;
-               set_subtotal(&t,subtotal);
-            }
-        }
-        insertar(&l,t);
-    }
-
-    fclose(fp);
-    MessageBox(0,"Carga completa.", "Aviso", MB_OK );
-                break;
+           case 8: { char cliente[50], fechat[5], idturno[5];
+                    int servicios, fpago;//diat es el número de turno elegido
+                    float subtotal;
+                    FILE *fp=fopen("turnos.txt", "r");
+                    turno p;
+                    reset_turno(&p);
+                    if(fp==NULL){
+                        printf("no se pudo abrir el archivo \n");
+                        exit(1);
+                    }
+                    while (!feof(fp)){
+                        fscanf(fp, "%s", &cliente);
+                        set_cliente(&p, cliente);
+                        fscanf(fp, "%s \n", &idturno);
+                        set_idturno(&p, idturno);//se guarda la fecha seleccionada//Este dato se pierde, solo queda el estado del día
+                        fscanf(fp, "%d \n", &servicios);
+                        set_servicios(&p, servicios);
+                        fscanf(fp, "%s \n", &fechat);
+                        set_fecha(&p, fechat);
+                        fscanf(fp, "%d \n", &fpago);
+                        set_fpago(&p, fpago);
+                        fscanf(fp, "%f \n", &subtotal);
+                        set_subtotal(&p, subtotal);
+                        printf("carga desde el archivo: \n");
+                        if (isEmpty(l)==1){
+                            insertar(&l, p);
+                            reset_turno(&p);
+                            muestra_turno(copia(l));
+                        }
+                            else {
+                                ordena(&l, busca_fecha(f, get_fecha(p)));
+                                insertar(&l, p);
+                                reset_turno(&p);
+                                muestra_turno(copia(l));
+                            }
+                }
+            fclose(fp);
+            break;
             }
             case 9: {//N modifica el precio y la descripcion de un servicio por su id
                 printf("ingrese el id del servicio (un numero entre el 0 y el 14) \n");
