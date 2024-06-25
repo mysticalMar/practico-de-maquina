@@ -94,6 +94,16 @@ void muestra_dias_disponibles(fecha f[], int *a)  //a registra cuántos dias se 
     }
     *a=*a+28;
 }
+
+void muestra_servicios_seleccionados(turno t){
+    int i;
+    for (i=0; i<15; i++){
+          if (get_servicios(t, i)==1){ //si el servicio está seleccionado
+            printf("Servicio: %d:", i);
+            printf(" %s \n", get_descripcion(aux_servicio[i]));
+          }
+    }
+}
 int seleccion_servicio(turno *t)
 {
     int serv;
@@ -369,7 +379,6 @@ void muestra_servicios (servicio s[]){
         printf("porcentaje de descuento: %d \n",get_descuento(s[i]));
     }
 }
-
 //extra
 int elementos(lista l){
     int c=0;
@@ -417,14 +426,15 @@ int main()
         printf("1. Cargar un turno en la lista por teclado \n");//a
         printf("2. Buscar dia \n");//d
         printf("3. Mostrar turnos ordenados por nombre \n");//e
-        printf("4. Modificar la forma de pago de un turno\n");//i
+        printf("4. Modificar la forma de pago de un turno\n");//j
         printf("5. Anular un turno\n");//k
         printf("6. Mostrar turno \n");//b y c
         printf("7. Guardar en un archivo los turnos por su forma de pago \n"); //l
         printf("8. Realizar una precarga de turnos anteriores \n");//m
         printf("9. Modificar el precio y la descripcion de un servicio \n");//n
         printf("10. Mostrar los servicios \n");//o
-        printf("11. Salir \n");
+        printf("11. Modificar el estado de un servicio a seleccionado \n");
+        printf("12. Salir \n");
         scanf("%d", &opcion);
 
         switch (opcion) {
@@ -523,7 +533,7 @@ int main()
                     MessageBox(0,"Lista vacía.", "Error", MB_OK );
                         break;
                     }
-                printf("que turno desea anular? \n");
+                printf("Ingrese el ID del turno que desea anular \n");
                     reset(&l);
                     while (!isOos(l)){
                         muestra_turno(copia(l));
@@ -572,8 +582,16 @@ int main()
                 MessageBox(0,"Lista vacía.", "Error", MB_OK );
                     break;
                 }
-                printf("ingrese el id del turno que desea buscar \n");
-                scanf ("%s", idturnoo);
+                printf("Ingrese el id del turno que desea buscar \n");
+                scanf ("%s", &idturnoo);
+                do{
+                if (comprueba(&l, idturnoo)==1){
+                        printf("El ID ingresado no pertenece a ningun turno. Ingrese el ID de nuevo \n");
+                         scanf("%s", &idturnoo);
+                         getchar();
+                        reset(&l);
+                    }
+                } while (comprueba(&l, idturnoo)==1);
                 muestra_turno(busca_turno(l,idturnoo));
                 break;
             }
@@ -654,6 +672,53 @@ int main()
                 break;
             }
             case 11: {
+                if (isEmpty(l)){
+                printf("\a");
+                MessageBox(0,"Lista vacía.", "Error", MB_OK );
+                    break;
+                }
+                printf("ingrese el ID del turno desea modificar \n");
+                reset(&l);
+                while (!isOos(l)){
+                    muestra_turno(copia(l));
+                    forwards(&l);
+                }
+                scanf("%s", &id);
+                getchar();
+                 do {
+                    if (comprueba(&l, id)==1){
+                        printf("El ID ingresado no pertenece a ningun turno. Ingrese el ID de nuevo \n");
+                         scanf("%s", &id);
+                         getchar();
+                        reset(&l);
+                    }
+                } while (comprueba(&l, id)==1);
+                  reset(&l);
+                   while (!isOos(l)){
+                        if (strcmp(get_idturno(copia(l)), id)==0){
+                        printf("Que servicio desea marcar como realizado? \n");
+                        muestra_servicios(aux_servicio);
+                        scanf("%d", &serv);
+                        getchar();
+                        do {
+                            if (serv<0||serv>15){
+                                MessageBox(0,"numero de servicio invalido, seleccione un numero entre 0 y 14.", "Error", MB_OK );
+                                scanf("%d", &serv);
+                                getchar();
+                            }
+                        } while ((serv<0||serv>15));
+                        t=copia(l);
+                        set_servicios(&t, serv);
+                        insertar(&l, t);
+                        MessageBox(0,"Cambio exitoso :D", "Aviso", MB_OK );
+                        muestra_turno(copia(l));
+                        break;
+                        }
+                            else forwards(&l);
+                    }
+                break;
+            }
+            case 12: {
                     printf("Saliendo del programa...\n");
                     return 0; // Salir del programa
                 }
